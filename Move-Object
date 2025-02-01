@@ -1,0 +1,57 @@
+// Click File → New Project → Java with Ant → Java Application → Next. 
+// Uncheck Create Main Class (since we’ll create it manually) → Finish.
+// Inside the Source Packages folder, right-click and select New → Java Class.
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+public class PixelGame extends JPanel implements KeyListener {
+    private int x = 50, y = 50; 
+
+    public PixelGame() {
+        setPreferredSize(new Dimension(800, 600)); 
+        addKeyListener(this);
+        setFocusable(true);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, getWidth(), getHeight()); 
+        
+       
+        g.setColor(Color.GREEN);
+        g.fillRect(x, y, 20, 20); 
+    }
+
+    public void move(int dx, int dy) {
+        x += dx;
+        y += dy;
+        repaint(); 
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_LEFT) move(-10, 0);
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT) move(10, 0);
+        if (e.getKeyCode() == KeyEvent.VK_UP) move(0, -10);
+        if (e.getKeyCode() == KeyEvent.VK_DOWN) move(0, 10);
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {}
+    @Override
+    public void keyTyped(KeyEvent e) {}
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Pixel Game");
+        PixelGame game = new PixelGame();
+        frame.add(game);
+        frame.pack();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+}
