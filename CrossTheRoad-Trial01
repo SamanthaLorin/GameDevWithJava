@@ -1,0 +1,139 @@
+// Click File → New Project → Java with Ant → Java Application → Next. 
+// Uncheck Create Main Class (since we’ll create it manually) → Finish.
+// Inside the Source Packages folder, right-click and select New → Java Class.
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.Random;
+
+public class CrossyChicken extends JPanel implements ActionListener, KeyListener {
+
+    private int chickenX = 250, chickenY = 450; 
+    private int score = 0;
+    private Timer timer;
+    private ArrayList<Car> cars;
+    private Random random = new Random();
+
+    public CrossyChicken() {
+        setPreferredSize(new Dimension(500, 500));
+        setBackground(Color.GREEN);
+        addKeyListener(this);
+        setFocusable(true);
+
+        cars = new ArrayList<>();
+        timer = new Timer(30, this);
+        timer.start();
+
+        
+        for (int i = 0; i < 5; i++) {
+            cars.add(new Car(random.nextInt(500), 100 + i * 80, 3 + random.nextInt(3)));
+        }
+    }
+
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        // GUI Road
+        g.setColor(Color.DARK_GRAY);
+        g.fillRect(0, 200, 500, 100);
+
+        // GUI Chicken (square)
+        g.setColor(Color.YELLOW);
+        g.fillRect(chickenX, chickenY, 30, 30);
+
+        // GUI 
+        for (Car car : cars) {
+            g.setColor(Color.RED);
+            g.fillRect(car.x, car.y, 50, 30);
+        }
+
+        // GUI scoreboard
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.BOLD, 20));
+        g.drawString("Score: " + score, 10, 30);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        // Move cars
+        for (Car car : cars) {
+            car.move();
+            if (car.x > 500) {
+                car.x = -50;
+                car.speed = 3 + random.nextInt(3); 
+            }
+
+            if (chickenX < car.x + 50 && chickenX + 30 > car.x
+                    && chickenY < car.y + 30 && chickenY + 30 > car.y) {
+                JOptionPane.showMessageDialog(this, "Game Over! Score: " + score);
+                resetGame();
+                return;
+            }
+        }
+
+        repaint();
+    }
+
+    private void resetGame() {
+        chickenX = 250;
+        chickenY = 450;
+        score = 0;
+        cars.clear();
+        for (int i = 0; i < 5; i++) {
+            cars.add(new Car(random.nextInt(500), 100 + i * 80, 3 + random.nextInt(3)));
+        }
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_LEFT && chickenX > 0) {
+            chickenX -= 30;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT && chickenX < 470) {
+            chickenX += 30;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_UP && chickenY > 0) {
+            chickenY -= 30;
+            score++;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_DOWN && chickenY < 470) {
+            chickenY += 30;
+        }
+        repaint();
+    }
+
+    public void keyReleased(KeyEvent e) {
+    }
+
+    public void keyTyped(KeyEvent e) {
+    }
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Crossy Chicken");
+        CrossyChicken game = new CrossyChicken();
+        frame.add(game);
+        frame.pack();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+}
+
+class Car {
+
+    int x, y, speed;
+
+    public Car(int x, int y, int speed) {
+        this.x = x;
+        this.y = y;
+        this.speed = speed;
+    }
+
+    public void move() {
+        x += speed;
+    }
+}
